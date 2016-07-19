@@ -5,7 +5,7 @@ project (http_server)
 ## Compiler flags.
 #############################
 #list( APPEND CMAKE_CXX_FLAGS "-pthread -std=c++0x -march=native -O2 -g -Wall ${CMAKE_CXX_FLAGS} ")
-list( APPEND CMAKE_CXX_FLAGS "-pthread -std=c++0x -march=native -ggdb3 -Wall ${CMAKE_CXX_FLAGS} ")
+list( APPEND CMAKE_CXX_FLAGS "-pthread -std=c++11 -DUNIX -march=native -ggdb3 -Wall ${CMAKE_CXX_FLAGS} ")
 
 ##########
 # Src
