@@ -107,7 +107,7 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 
 	//form content length
 	std::stringstream ss;
-	ss<<resp<<sz-1<<"\r\n";
+	ss<<resp<<sz<<"\r\n";
 	resp=ss.str(); 
 
 	//make response
@@ -143,19 +143,23 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 			ss << std::endl;
 			//ss << "\r\n";
 			//tmp_str = "\r\n";
-			tmp_str = "\r\n";
-			send(fd, tmp_str.c_str(), tmp_str.length(), 0); 
+			//tmp_str = "\r\n";
+			//send(fd, tmp_str.c_str(), tmp_str.length(), 0); 
 			continue;
 		}
 		//std::cout << tmp_str << "\r\n";
-		std::cout << tmp_str << std::endl;
-		ss << tmp_str << "\r\n";
-		send(fd, tmp_str.c_str(), tmp_str.length() ,0 ); 
+		//std::cout << tmp_str << std::endl;
+		ss << tmp_str;
+		//send(fd, tmp_str.c_str(), tmp_str.length() ,0 ); 
 	}
 	resp += ss.str();
+	tmp_str = "";
+	tmp_str = resp;
+	std::cout << "resp" << std::endl;
+	send(fd, tmp_str.c_str(), tmp_str.length() ,0 ); 
+	close(fd);
 	hfile.close();
 	close(page);
-	close(fd);
 	return 0;
 	do{
 
