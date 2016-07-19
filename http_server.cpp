@@ -79,13 +79,23 @@ std::mutex currentPlayers_mutex;
 
 int processGetRequest(std::string& path, std::string& resp, int fd) {
 
-	/*std::string */resp= "HTTP/1.0 200 OK\r\n\r\n";//Date: Fri, 20 Dec 2016 23:59:59 GMT\r\nServer: lab5 \r\nContent-Length: ";
+//	/*std::string */resp= "HTTP/1.0 200 OK\r\n\r\n";//Date: Fri, 20 Dec 2016 23:59:59 GMT\r\nServer: lab5 \r\nContent-Length: ";
+	std::cout << __func__ << ": " << path << std::endl;
+	int page= open(path.c_str(),O_RDONLY);
+
+	FILE * pageF= fdopen(page,"rb"); 
+	fseek(pageF, 0L, SEEK_END);
+	int sz = ftell(pageF);
+	fseek(pageF, 0L, SEEK_SET);
+
+	std::stringstream ss;
+	ss << "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nContent-length: ";
+	ss << sz;
+	ss << "\r\nConnection: close\r\n\r\n";
 	//string path="";
 	//path =request.path;
 
 	//find file
-	std::cout << __func__ << ": " << path << std::endl;
-	int page= open(path.c_str(),O_RDONLY);
 
 	if(page<0){
 		perror("open");
@@ -100,13 +110,9 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 		return 0; 
 	}
 	//get size
-	FILE * pageF= fdopen(page,"rb"); 
-	fseek(pageF, 0L, SEEK_END);
-	int sz = ftell(pageF);
-	fseek(pageF, 0L, SEEK_SET);
+
 
 	//form content length
-	std::stringstream ss;
 	//ss<<resp<<sz<<"\r\n";
 	//resp=ss.str(); 
 
