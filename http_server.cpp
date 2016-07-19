@@ -77,8 +77,7 @@ std::mutex currentPlayers_mutex;
 
 
 
-int processGetRequest(std::string& path, std::string& resp)
-{
+int processGetRequest(std::string& path, std::string& resp, int fd) {
 
 	/*std::string */resp= "HTTP/1.0 200 Document follows\r\nServer: lab5 \r\nContent-Length: ";
 	//string path="";
@@ -94,7 +93,9 @@ int processGetRequest(std::string& path, std::string& resp)
 		std::cout<< "404 \n";
 		resp = "HTTP/1.0 404 File Not Found\r\nServer: lab5 \r\nContent-Length: 0\r\nContent-type: text/html\r\n\r\n";
 
-//		write( *fd, resp.c_str(), resp.length());
+		send(fd, resp.c_str(), resp.length(), 0);
+		close(fd);
+		
 
 		return 0; 
 	}
@@ -106,7 +107,7 @@ int processGetRequest(std::string& path, std::string& resp)
 
 	//form content length
 	std::stringstream ss;
-	ss<<resp<<sz<<"\r\n";
+	ss<<resp<<sz-1<<"\r\n";
 	resp=ss.str(); 
 
 	//make response
@@ -135,17 +136,26 @@ int processGetRequest(std::string& path, std::string& resp)
 	std::ifstream hfile(path);
 //	hfile.open(path);
 	std::string tmp_str = "";
+
+	send(fd, resp.c_str(), resp.length(), 0); 
 	while(getline(hfile,tmp_str)) {
 		if (tmp_str.empty()) {
-			ss << "\r\n";
+			ss << std::endl;
+			//ss << "\r\n";
+			//tmp_str = "\r\n";
+			tmp_str = "\r\n";
+			send(fd, tmp_str.c_str(), tmp_str.length(), 0); 
 			continue;
 		}
-		std::cout << tmp_str << "\r\n";
-		ss << tmp_str;
+		//std::cout << tmp_str << "\r\n";
+		std::cout << tmp_str << std::endl;
+		ss << tmp_str << "\r\n";
+		send(fd, tmp_str.c_str(), tmp_str.length() ,0 ); 
 	}
 	resp += ss.str();
 	hfile.close();
 	close(page);
+	close(fd);
 	return 0;
 	do{
 
@@ -251,17 +261,18 @@ int http_handler(std::queue<struct event_data>* ring_buffer, std::string dir) {
 			
 			
 			std::string out_str;
-			processGetRequest(file_path, out_str);
+			processGetRequest(file_path, out_str, client_fd);
 			std::cout << "RESPONSE:\n" << out_str << std::endl;
 			
 			//s = write(client_fd, out_str.c_str(), out_str.size());
-			s = send(client_fd, out_str.c_str(), out_str.size(),0);
+//			s = send(client_fd, out_str.c_str(), out_str.size(),0);
+
 			//s = write(client_fd, "123", 4);
-			std::cout << s  << std::endl;
-			if (s == -1) {
-				perror ("echo");
-				abort ();
-			}
+//			std::cout << s  << std::endl;
+//			if (s == -1) {
+//				perror ("echo");
+//				abort ();
+//			}
 			
 
 			ring_buffer->pop();
