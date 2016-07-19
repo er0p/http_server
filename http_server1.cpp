@@ -192,11 +192,12 @@ void process_slave_socket(int slave_socket)
     {
         strcpy(reply, "HTTP/1.1 404 Not Found\r\n"
                       "Content-Type: text/html\r\n"
-                      "Content-length: 107\r\n"
+                      "Content-length: 0\r\n"
                       "Connection: close\r\n"
                       "\r\n");
 
         ssize_t send_ret = send(slave_socket, reply, strlen(reply), MSG_NOSIGNAL);
+	return;
 #   ifdef HTTP_DEBUG
         std::cout << "do_work: send return " << send_ret << std::endl;
 #   endif
