@@ -79,7 +79,7 @@ std::mutex currentPlayers_mutex;
 
 int processGetRequest(std::string& path, std::string& resp, int fd) {
 
-	/*std::string */resp= "HTTP/1.0 200 OK\r\nDate: Fri, 20 Dec 2016 23:59:59 GMT\r\nServer: lab5 \r\nContent-Length: ";
+	/*std::string */resp= "HTTP/1.0 200 OK\r\n\r\n";//Date: Fri, 20 Dec 2016 23:59:59 GMT\r\nServer: lab5 \r\nContent-Length: ";
 	//string path="";
 	//path =request.path;
 
@@ -107,11 +107,12 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 
 	//form content length
 	std::stringstream ss;
-	ss<<resp<<sz<<"\r\n";
-	resp=ss.str(); 
+	//ss<<resp<<sz<<"\r\n";
+	//resp=ss.str(); 
 
 	//make response
 	
+/*
 	if(path.find(".gif")!=std::string::npos)
 		resp += "Content-type: image/gif\r\n\r\n";
 	else if(path.find(".png")!=std::string::npos)
@@ -120,7 +121,7 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 		resp += "Content-type: image/jpeg\r\n\r\n";
 	else
 		resp += "Content-type: text/html\r\n\r\n";
-
+*/
 	//write response
 //	write( *fd, resp.c_str(), resp.length());
 
@@ -140,8 +141,8 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 	send(fd, resp.c_str(), resp.length(), 0); 
 	while(getline(hfile,tmp_str)) {
 		if (tmp_str.empty()) {
-			ss << std::endl;
-			//ss << "\r\n";
+			//ss << std::endl;
+			ss << "\n";
 			//tmp_str = "\r\n";
 			//tmp_str = "\r\n";
 			//send(fd, tmp_str.c_str(), tmp_str.length(), 0); 
@@ -149,14 +150,16 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 		}
 		//std::cout << tmp_str << "\r\n";
 		//std::cout << tmp_str << std::endl;
-		ss << tmp_str;
+		ss << tmp_str << "\n";
 		//send(fd, tmp_str.c_str(), tmp_str.length() ,0 ); 
 	}
 	resp += ss.str();
 	tmp_str = "";
 	tmp_str = resp;
-	std::cout << "resp" << std::endl;
-	send(fd, tmp_str.c_str(), tmp_str.length() ,0 ); 
+	tmp_str[tmp_str.size()-1] = '\0';
+	std::cout << tmp_str << std::endl;
+	int sended = send(fd, tmp_str.c_str(), tmp_str.size() ,0 ); 
+	std::cout << "sended = " << sended << std::endl;
 	close(fd);
 	hfile.close();
 	close(page);
@@ -266,7 +269,7 @@ int http_handler(std::queue<struct event_data>* ring_buffer, std::string dir) {
 			
 			std::string out_str;
 			processGetRequest(file_path, out_str, client_fd);
-			std::cout << "RESPONSE:\n" << out_str << std::endl;
+			//std::cout << "RESPONSE:\n" << out_str << std::endl;
 			
 			//s = write(client_fd, out_str.c_str(), out_str.size());
 //			s = send(client_fd, out_str.c_str(), out_str.size(),0);
