@@ -101,7 +101,7 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 	fseek(pageF, 0L, SEEK_SET);
 
 	std::stringstream ss;
-	ss << "HTTP/1.0 200 OK\r\n\r\nContent-Type: text/html\r\nContent-length: ";
+	ss << "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nContent-length: ";
 	ss << sz;
 	ss << "\r\nConnection: close\r\n\r\n";
 	resp = ss.str();
