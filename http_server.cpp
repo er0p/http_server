@@ -583,6 +583,10 @@ int main (int argc, char *argv[]) {
 		} else if(child > 0) { // parent, returned child pid
 			return 0;
 		}
+		close (STDIN_FILENO);
+	        close (STDOUT_FILENO);
+	        close (STDERR_FILENO);
+
 	}
 	// Start the worker thread.
 	//std::thread t{process_messages, ring_buffer};
