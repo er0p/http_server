@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <fcntl.h>
+#include <fstream>
 
 #include <cassert>
 #include <thread>
@@ -91,7 +92,7 @@ int processGetRequest(std::string& path, std::string& resp)
 		perror("open");
 //		std::cout<< "fd = " << *fd <<" 404 \n";
 		std::cout<< "404 \n";
-		resp = "HTTP/1.0 404 File Not Found\r\nServer: lab5 \r\nContent-type: text/html\r\n\r\n";
+		resp = "HTTP/1.0 404 File Not Found\r\nServer: lab5 \r\nContent-Length: 0\r\nContent-type: text/html\r\n\r\n";
 
 //		write( *fd, resp.c_str(), resp.length());
 
@@ -122,18 +123,34 @@ int processGetRequest(std::string& path, std::string& resp)
 	//write response
 //	write( *fd, resp.c_str(), resp.length());
 
-	close (page);
-	return 0;
 
 	int total=0;      
 	char buff[1024];
 	int readBytes = 0;
 	int er;
+	
+	ss.str(std::string());
 
 	//send file
+	std::ifstream hfile(path);
+//	hfile.open(path);
+	std::string tmp_str = "";
+	while(getline(hfile,tmp_str)) {
+		if (tmp_str.empty()) {
+			ss << "\r\n";
+			continue;
+		}
+		std::cout << tmp_str << "\r\n";
+		ss << tmp_str;
+	}
+	resp += ss.str();
+	hfile.close();
+	close(page);
+	return 0;
 	do{
 
-		readBytes= read(page, buff, 1024);
+		std::cout<<"page fd "<< page <<"\n";
+		readBytes= read(page, buff, sizeof(buff));
 		std::cout<<"read bytes "<<readBytes<<"\n";
 
 		if(readBytes<0){
@@ -142,17 +159,21 @@ int processGetRequest(std::string& path, std::string& resp)
 			break;
 		}
 		total+=readBytes;
+		ss << buff;
 		//er=  send( *fd, buff, readBytes,0 );   
-		std::cout<<"sent bytes "<<er<<"\n";
-		if (er==-1){
-			perror("send");
-		}
-		else if( er != readBytes){
-			std::cout<<"Read write miss match\n";
-		}
+		//std::cout<<"sent bytes "<<er<<"\n";
+		//if (er==-1){
+		//	perror("send");
+		//}
+		//else if( er != readBytes){
+		//	std::cout<<"Read write miss match\n";
+		//}
 
 	}while(readBytes>0);
-
+	
+	//resp += ss.str();
+	resp += "123123\r\n";
+	
 	close(page);
 	return 0;
 }	
@@ -231,15 +252,17 @@ int http_handler(std::queue<struct event_data>* ring_buffer, std::string dir) {
 			
 			std::string out_str;
 			processGetRequest(file_path, out_str);
-			std::cout << "RESPONCE:\n" << out_str << std::endl;
-
-			s = write(client_fd, out_str.c_str(), out_str.size());
+			std::cout << "RESPONSE:\n" << out_str << std::endl;
+			
+			//s = write(client_fd, out_str.c_str(), out_str.size());
+			s = send(client_fd, out_str.c_str(), out_str.size(),0);
 			//s = write(client_fd, "123", 4);
 			std::cout << s  << std::endl;
 			if (s == -1) {
 				perror ("echo");
 				abort ();
 			}
+			
 
 			ring_buffer->pop();
 			++num_events_processed;
