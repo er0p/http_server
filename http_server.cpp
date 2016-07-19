@@ -297,6 +297,10 @@ int http_handler(std::queue<struct event_data>* ring_buffer, std::string dir) {
 			size_t pos_q = file_path.find("?");
 			if(pos_q != std::string::npos)
 				file_path = file_path.substr(0,pos_q);
+			pos_q = file_path.find("&");
+			if(pos_q != std::string::npos)
+				file_path = file_path.substr(0,pos_q);
+
 			std::cout << "file_path !!!!!!!!!!! " << file_path << std::endl;
 			file_path.insert(0,dir);
 			std::cout << file_path << std::endl;
