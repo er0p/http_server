@@ -281,7 +281,10 @@ int http_handler(std::queue<struct event_data>* ring_buffer, std::string dir) {
 			std::cout << pos_slash << " " << pos_space << std::endl;
 			//if( (pos_space - pos_slash) == 1)
 			file_path = in_s.substr(pos_slash, (pos_space-pos_slash));
-			std::cout << file_path << std::endl;
+			size_t pos_q = file_path.find("?");
+			if(pos_q != std::string::npos)
+				file_path = file_path.substr(0,pos_q);
+			std::cout << "file_path !!!!!!!!!!! " << file_path << std::endl;
 			file_path.insert(0,dir);
 			std::cout << file_path << std::endl;
 			
