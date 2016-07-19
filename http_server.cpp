@@ -9,6 +9,9 @@
 #include <fcntl.h>
 #include <fstream>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include <cassert>
 #include <thread>
 #include <mutex>
@@ -83,6 +86,7 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 	std::cout << __func__ << ": " << path << std::endl;
 	int page= open(path.c_str(),O_RDONLY);
 	if(page<0){
+fail:
 		perror("open");
 //		std::cout<< "fd = " << *fd <<" 404 \n";
 		std::cout<< "404 \n";
@@ -93,6 +97,15 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 		
 
 		return 0; 
+	}
+	struct stat st;
+	if(fstat(page, &st) != 0) {
+		perror("fstat");
+		goto fail;
+	}
+	if(!S_ISREG(st.st_mode)) {
+		printf("not a file\n");
+		goto fail;
 	}
 
 	FILE * pageF= fdopen(page,"rb"); 
