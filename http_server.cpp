@@ -82,21 +82,6 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 //	/*std::string */resp= "HTTP/1.0 200 OK\r\n\r\n";//Date: Fri, 20 Dec 2016 23:59:59 GMT\r\nServer: lab5 \r\nContent-Length: ";
 	std::cout << __func__ << ": " << path << std::endl;
 	int page= open(path.c_str(),O_RDONLY);
-
-	FILE * pageF= fdopen(page,"rb"); 
-	fseek(pageF, 0L, SEEK_END);
-	int sz = ftell(pageF);
-	fseek(pageF, 0L, SEEK_SET);
-
-	std::stringstream ss;
-	ss << "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nContent-length: ";
-	ss << sz;
-	ss << "\r\nConnection: close\r\n\r\n";
-	//string path="";
-	//path =request.path;
-
-	//find file
-
 	if(page<0){
 		perror("open");
 //		std::cout<< "fd = " << *fd <<" 404 \n";
@@ -109,7 +94,24 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 
 		return 0; 
 	}
-	//get size
+
+	FILE * pageF= fdopen(page,"rb"); 
+	fseek(pageF, 0L, SEEK_END);
+	int sz = ftell(pageF);
+	fseek(pageF, 0L, SEEK_SET);
+
+	std::stringstream ss;
+	ss << "HTTP/1.0 200 OK\r\n\r\nContent-Type: text/html\r\nContent-length: ";
+	ss << sz;
+	ss << "\r\nConnection: close\r\n\r\n";
+	resp = ss.str();
+	send(fd, resp.c_str(), resp.length(), 0); 
+	//string path="";
+	//path =request.path;
+
+	//find file
+
+		//get size
 
 
 	//form content length
@@ -137,6 +139,7 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 	int readBytes = 0;
 	int er;
 	
+	ss.clear();
 	ss.str(std::string());
 
 	//send file
@@ -144,7 +147,6 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 //	hfile.open(path);
 	std::string tmp_str = "";
 
-	send(fd, resp.c_str(), resp.length(), 0); 
 	while(getline(hfile,tmp_str)) {
 		if (tmp_str.empty()) {
 			//ss << std::endl;
@@ -159,10 +161,10 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 		ss << tmp_str << "\n";
 		//send(fd, tmp_str.c_str(), tmp_str.length() ,0 ); 
 	}
-	resp += ss.str();
+	resp = ss.str();
 	tmp_str = "";
 	tmp_str = resp;
-	tmp_str[tmp_str.size()-1] = '\0';
+//	tmp_str[tmp_str.size()-1] = '\0';
 	std::cout << tmp_str << std::endl;
 	int sended = send(fd, tmp_str.c_str(), tmp_str.size() ,0 ); 
 	std::cout << "sended = " << sended << std::endl;
