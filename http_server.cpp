@@ -79,7 +79,7 @@ std::mutex currentPlayers_mutex;
 
 int processGetRequest(std::string& path, std::string& resp, int fd) {
 
-	/*std::string */resp= "HTTP/1.0 200\r\nDate: Fri, 20 Dec 2016 23:59:59 GMT\r\nServer: lab5 \r\nContent-Length: ";
+	/*std::string */resp= "HTTP/1.0 200 OK\r\nDate: Fri, 20 Dec 2016 23:59:59 GMT\r\nServer: lab5 \r\nContent-Length: ";
 	//string path="";
 	//path =request.path;
 
@@ -91,7 +91,7 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 		perror("open");
 //		std::cout<< "fd = " << *fd <<" 404 \n";
 		std::cout<< "404 \n";
-		resp = "HTTP/1.0 404 File Not Found\r\nServer: lab5 \r\nContent-Length: 0\r\nContent-type: text/html\r\n\r\n";
+		resp = "HTTP/1.0 404 NOT FOUND\r\nServer: lab5 \r\nContent-Length: 0\r\nContent-type: text/html\r\n\r\n";
 
 		send(fd, resp.c_str(), resp.length(), 0);
 		close(fd);
