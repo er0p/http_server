@@ -103,7 +103,8 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 	std::stringstream ss;
 	ss << "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nContent-length: ";
 	ss << sz;
-	ss << "\r\nConnection: close\r\n\r\n";
+//	ss << "\r\nConnection: close\r\n\r\n";
+	ss << "\r\n\r\n";
 	resp = ss.str();
 	send(fd, resp.c_str(), resp.length(), 0); 
 	//string path="";
