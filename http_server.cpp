@@ -99,14 +99,24 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 	fseek(pageF, 0L, SEEK_END);
 	int sz = ftell(pageF);
 	fseek(pageF, 0L, SEEK_SET);
-
 	std::stringstream ss;
+/*
 	ss << "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nContent-length: ";
 	ss << sz;
 //	ss << "\r\nConnection: close\r\n\r\n";
 	ss << "\r\n\r\n";
 	resp = ss.str();
-	send(fd, resp.c_str(), resp.length(), 0); 
+*/
+
+	ss << "HTTP/1.0 200 OK";
+	ss << "\r\n";
+	ss << "Content-length: ";
+	ss << sz;
+	ss << "\r\n";
+	ss << "Content-Type: text/html";
+	ss << "\r\n\r\n";
+//	ss << data;
+//	send(fd, resp.c_str(), resp.length(), 0); 
 	//string path="";
 	//path =request.path;
 
@@ -140,8 +150,8 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 	int readBytes = 0;
 	int er;
 	
-	ss.clear();
-	ss.str(std::string());
+//	ss.clear();
+//	ss.str(std::string());
 
 	//send file
 	std::ifstream hfile(path);
@@ -163,7 +173,7 @@ int processGetRequest(std::string& path, std::string& resp, int fd) {
 		//send(fd, tmp_str.c_str(), tmp_str.length() ,0 ); 
 	}
 	resp = ss.str();
-	tmp_str = "";
+//	tmp_str = "";
 	tmp_str = resp;
 //	tmp_str[tmp_str.size()-1] = '\0';
 	std::cout << tmp_str << std::endl;
